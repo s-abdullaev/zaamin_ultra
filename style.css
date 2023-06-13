@@ -1,0 +1,219 @@
+@font-face {
+  font-family: 'Xolonium';
+  src: url('assets/Xolonium.woff') format('woff');
+}
+
+*,
+*::before,
+*::after {
+  font-family: 'Xolonium';
+  box-sizing: border-box;
+}
+
+.meteostation,
+.meteostation-finish {
+  margin: 10px 0;
+}
+
+.forecast {
+  padding: 10px;
+}
+
+.general-info-wrapper {
+  align-items: center;
+}
+
+.info-container {
+  border-radius: 10px;
+  background-color: gainsboro;
+}
+
+.img-container img {
+  border-radius: 10px;
+  aspect-ratio: 5/3;
+  width: 100%;
+  height: auto;
+}
+
+.temperature-detailed i {
+  width: 16px !important;
+  margin: 0 auto;
+}
+
+.detailed-info {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: gainsboro;
+}
+
+.detailed-info-wrapper {
+  text-align: left;
+}
+
+.left-side,
+.right-side {
+  padding: 0 15px;
+}
+
+.current i {
+  width: 16px !important;
+  margin: 0 auto;
+  text-align: end;
+}
+
+.detailed-info-wrapper p {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid gray;
+}
+
+.aqi-box {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.aqi-box .aqi-img {
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.aqi-desc {
+  padding: 0 10px;
+}
+
+.aqi-img img {
+  width: 56px;
+  height: 56px;
+  display: inline-block;
+}
+
+.aqi-status {
+  padding: 6px;
+  border-radius: 10px;
+  width: fit-content;
+  background-color: rgb(236, 255, 249);
+  color: rgb(0, 207, 138);
+}
+
+.temperature-box {
+  display: flex;
+  align-items: center;
+}
+
+.temperature-box > div {
+  margin: 0 10px;
+}
+
+.temperature-box img {
+  width: 64px;
+  height: auto;
+}
+
+.temperature-big {
+  font-size: 48px;
+}
+
+.link {
+  color: rgb(7, 7, 172);
+  text-align: center;
+}
+
+.link img {
+  width: 100px;
+}
+
+.card-wrapper {
+  padding: 10px;
+}
+
+.forecast-start,
+.forecast-end {
+  align-items: center;
+  padding: 10px;
+}
+
+.forecast-start .forecast-card .card-wrapper {
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+}
+
+.forecast-end .forecast-card:first-child .card-wrapper {
+  border: 3px solid lightgrey;
+  border-radius: 5px;
+}
+
+.forecast-end .forecast-card:nth-child(2) .card-wrapper {
+  border: 3px solid #f60c5a;
+  border-radius: 5px;
+}
+
+.part {
+  flex: 1 1 0px;
+  margin: 0 2px;
+  text-align: center;
+}
+
+.part div {
+  padding: 3px 0;
+  font-weight: 500;
+}
+
+.part span {
+  font-weight: normal;
+  font-size: 10px;
+}
+
+.part {
+  text-align: center;
+}
+
+.rain-part,
+.humidity-part {
+  color: rgb(64, 158, 235);
+}
+
+.temperature-part div {
+  margin: 5px 0;
+}
+
+.date-part span {
+  font-size: 18px;
+}
+
+.rain-part img {
+  width: 14px;
+  height: 14px;
+}
+
+.aqi-img-wrapper {
+  border-radius: 10px;
+}
+
+.aqi-value {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.aqi-icon {
+  margin: 0 5px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+@media only screen and (max-width: 576px) {
+  .temperature-box img {
+    width: 48px;
+    height: auto;
+  }
+
+  .temperature-big {
+    font-size: 36px;
+  }
+}
