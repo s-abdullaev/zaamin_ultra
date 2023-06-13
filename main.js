@@ -193,7 +193,7 @@ const comAmudarIO = {
   },
 
   getDevice: async function () {
-    const response = await fetch('http://oxus.amudar.io/api/meteoDevices', {
+    const response = await fetch('https://oxus.amudar.io/api/meteoDevices', {
       method: 'GET',
       headers: this._headers_zamin,
     });
@@ -202,7 +202,7 @@ const comAmudarIO = {
   },
 
   getMeteostationData: async function () {
-    const resp = await fetch('http://oxus.amudar.io/api/influx/meteostation', {
+    const resp = await fetch('https://oxus.amudar.io/api/influx/meteostation', {
       method: 'POST',
       headers: this._headers_tashkent,
       body: JSON.stringify({
@@ -218,7 +218,7 @@ const comAmudarIO = {
 
   getForecastData: async function () {
     const response = await fetch(
-      'http://oxus.amudar.io/api/forecasts/device/00000000',
+      'https://oxus.amudar.io/api/forecasts/device/00000000',
       {
         method: 'GET',
         headers: this._headers_zamin,
