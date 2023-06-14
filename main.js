@@ -301,7 +301,7 @@ const comAmudarIO = {
           : 0;
       lastDust = i > 0 ? (data[i - 1].pm25 ? data[i - 1].pm25 : lastDust) : 0;
       let forecastCard = document.createElement('div');
-      forecastCard.setAttribute('class', 'forecast-card col-12 col-sm-6 px-1');
+      forecastCard.setAttribute('class', 'forecast-card col-12 col-sm-6 p-1');
       forecastCard.innerHTML = `<div class="card-wrapper">
         ${this.getDateElement(element.time, i)}
         ${this.getTemperatureElement(element.time)}

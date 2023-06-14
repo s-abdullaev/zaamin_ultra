@@ -12,11 +12,6 @@
 
 .meteostation,
 .meteostation-finish {
-  margin: 10px 0;
-}
-
-.forecast {
-  padding: 10px;
 }
 
 .general-info-wrapper {
@@ -137,6 +132,10 @@
   padding: 10px;
 }
 
+.forecast-start {
+  border-right: 2px solid gray;
+}
+
 .forecast-start .forecast-card .card-wrapper {
   border: 1px solid lightgrey;
   border-radius: 5px;
@@ -207,7 +206,22 @@
   font-weight: 700;
 }
 
+@media only screen and (max-width: 992px) {
+  .forecast-start {
+    border-right: none;
+    /* border-bottom: 2px solid gray; */
+  }
+}
+
 @media only screen and (max-width: 576px) {
+  .forecast-start {
+    padding-bottom: 0;
+  }
+
+  .forecast-end {
+    padding-top: 0;
+  }
+
   .temperature-box img {
     width: 48px;
     height: auto;
