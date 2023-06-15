@@ -45,6 +45,10 @@
   padding: 0 15px;
 }
 
+.detailed-info-wrapper p {
+  padding: 0 5px;
+}
+
 .current i {
   width: 16px !important;
   margin: 0 auto;
@@ -204,6 +208,12 @@
   .forecast-start {
     border-right: none;
     /* border-bottom: 2px solid gray; */
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .detailed-info-wrapper p:nth-child(3) {
+    margin-bottom: 0;
   }
 }
 
