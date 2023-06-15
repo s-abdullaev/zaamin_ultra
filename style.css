@@ -3,9 +3,7 @@
   src: url('assets/Xolonium.woff') format('woff');
 }
 
-*,
-*::before,
-*::after {
+* {
   font-family: 'Xolonium';
   box-sizing: border-box;
 }

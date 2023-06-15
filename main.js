@@ -178,18 +178,32 @@ const comAmudarIO = {
     const currentForecast = forecastData.find(
       (d) => new Date(d.time).getHours() === new Date().getHours()
     );
+    console.log(currentForecast);
     const meteostationData = await this.getMeteostationData();
     const first4Days = this.getLast4Days(forecastData);
     const temperatures = this.getTemperature(forecastData);
     const device = await this.getDevice();
-    // this.addMeteostationData(meteostationData[meteostationData.length - 1]);
-    // this.addMeteostationFinishData(currentForecast);
+    const imgSrcStart = this.getImgSrc(
+      currentForecast.pictocode,
+      currentForecast.isdaylight
+    );
+    this.addMeteostationData(
+      meteostationData[meteostationData.length - 1],
+      imgSrcStart
+    );
+    this.addMeteostationFinishData(currentForecast, imgSrcStart);
 
-    // this.addCurrentAQI(meteostationData);
-    // this.addCurrentAQIFinish(currentForecast);
-    // this.setCurrentTemperature(meteostationData);
-    // this.setCurrentTemperatureFinish(forecastData);
+    this.addCurrentAQI(meteostationData);
+    this.addCurrentAQIFinish(currentForecast);
+    this.setCurrentTemperature(meteostationData);
+    this.setCurrentTemperatureFinish(forecastData);
     this.generateForecastCards(first4Days);
+  },
+
+  getImgSrc: function (pictocode, isDayLight) {
+    pictocode = pictocode < 10 ?? '0' + pictocode;
+    const src = pictocode + isDayLight ? '_day.svg' : '_night.svg';
+    return src;
   },
 
   getDevice: async function () {
@@ -254,12 +268,15 @@ const comAmudarIO = {
       device.asl + translations[this.language].aboveSeaLevel;
   },
 
-  setCurrentTemperature: function (data) {
+  setCurrentTemperature: function (data, imgSrc) {
     const currentTemperature = Math.round(data[data.length - 1].AirT);
     const temperatures = data.map((d) => d.AirT);
     const max = Math.max(...temperatures);
     const min = Math.min(...temperatures);
-
+    const picElement = document
+      .querySelector('.pictocode')
+      .querySelector('img');
+    picElement.setAttribute('src', imgSrc);
     document.querySelector('.max-temp').innerHTML = Math.round(max) + '°C';
     document.querySelector('.min-temp').innerHTML = Math.round(min) + '°C';
     document.querySelector('.temperature-big').innerHTML =
@@ -380,7 +397,7 @@ const comAmudarIO = {
     }
   },
 
-  addMeteostationData: function (data) {
+  addMeteostationData: function (data, imgSrc) {
     const temperatureElem = document.querySelector('.c-temperature');
     temperatureElem.innerHTML = `<span>
     <i class="fa-solid fa-temperature-three-quarters me-2"></i>${
