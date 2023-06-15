@@ -3,8 +3,8 @@ const translations = {
     noData: 'N/A',
     airQuality: 'Качество воздуха:',
     aboveSeaLevel: 'м над уровнем море',
-    temperature: 'Температура воздуха',
-    humidity: 'Относительная влажность',
+    temperature: 'Температура',
+    humidity: 'Bлажность',
     precipitation: 'Ocaдки',
     windspeed: 'Скорость ветра',
     winddirection: 'Направление ветра',
@@ -33,7 +33,7 @@ const translations = {
     noData: 'N/A',
     airQuality: 'Havo sifati:',
     aboveSeaLevel: 'm dengiz sathidan',
-    temperature: 'Havo harorati',
+    temperature: 'Harorat',
     humidity: 'Nisbiy namlik',
     precipitation: "Yog'ingarchilik",
     windspeed: 'Shamol tezligi',
@@ -64,7 +64,7 @@ const translations = {
     airQuality: 'Air quality:',
     aboveSeaLevel: 'm above sea level',
     temperature: 'Air temperature',
-    humidity: 'Relative humidity',
+    humidity: 'Humidity',
     precipitation: 'Precipitation',
     windspeed: 'Wind speed',
     winddirection: 'Wind direction',
@@ -160,6 +160,7 @@ const tashkentCityToken = 'Bearer 19|LPFBmcdmbXhR02izysneHsgkMz4ObWC9DJQw81Cc';
 const tashkentCityStationId = '036112022';
 const zaminToken = 'Bearer 23|Sgu8NP1r1jt7t6qrd8ilI8f58MBdJC0UajPE0pgu';
 const zaminStationId = '00000000';
+const zaminStationIdEnd = '12345678';
 const comAmudarIO = {
   language: 'en',
   _dustColor: '',
@@ -175,35 +176,35 @@ const comAmudarIO = {
   start: async function () {
     const forecastData = await this.getForecastData();
     this._forecastData = forecastData;
-    const currentForecast = forecastData.find(
+    const currentForecastStart = forecastData.find(
       (d) => new Date(d.time).getHours() === new Date().getHours()
     );
-    console.log(currentForecast);
+    const forecastFinish = await this.getForecastFinishData();
+    const currForecastFinish = forecastFinish.find(
+      (d) => new Date(d.time).getHours() === new Date().getHours()
+    );
     const meteostationData = await this.getMeteostationData();
     const first4Days = this.getLast4Days(forecastData);
     const temperatures = this.getTemperature(forecastData);
     const device = await this.getDevice();
     const imgSrcStart = this.getImgSrc(
-      currentForecast.pictocode,
-      currentForecast.isdaylight
+      currentForecastStart.pictocode,
+      currentForecastStart.isdaylight
     );
-    this.addMeteostationData(
-      meteostationData[meteostationData.length - 1],
-      imgSrcStart
-    );
-    this.addMeteostationFinishData(currentForecast, imgSrcStart);
+    this.addMeteostationData(meteostationData[meteostationData.length - 1]);
+    this.addMeteostationFinishData(currForecastFinish);
 
     this.addCurrentAQI(meteostationData);
-    this.addCurrentAQIFinish(currentForecast);
-    this.setCurrentTemperature(meteostationData);
-    this.setCurrentTemperatureFinish(forecastData);
+    this.addCurrentAQIFinish(currForecastFinish);
+    this.setCurrentTemperature(meteostationData, imgSrcStart);
+    this.setCurrentTemperatureFinish(forecastData, imgSrcStart);
     this.generateForecastCards(first4Days);
   },
 
   getImgSrc: function (pictocode, isDayLight) {
-    pictocode = pictocode < 10 ?? '0' + pictocode;
-    const src = pictocode + isDayLight ? '_day.svg' : '_night.svg';
-    return src;
+    pictocode = pictocode < 10 ? '0' + pictocode : pictocode;
+    const src = pictocode + (isDayLight ? '_day.svg' : '_night.svg');
+    return 'assets/meteoblue_weather_pictograms_2016-11-04/svg/' + src;
   },
 
   getDevice: async function () {
@@ -233,6 +234,19 @@ const comAmudarIO = {
   getForecastData: async function () {
     const response = await fetch(
       'https://oxus.amudar.io/api/forecasts/device/00000000',
+      {
+        method: 'GET',
+        headers: this._headers_zamin,
+      }
+    );
+    const responseJSON = await response.json();
+    const data = responseJSON.data;
+    return data;
+  },
+
+  getForecastFinishData: async function () {
+    const response = await fetch(
+      'https://oxus.amudar.io/api/forecasts/device/01234567',
       {
         method: 'GET',
         headers: this._headers_zamin,
@@ -274,6 +288,7 @@ const comAmudarIO = {
     const max = Math.max(...temperatures);
     const min = Math.min(...temperatures);
     const picElement = document
+      .querySelector('.meteostation')
       .querySelector('.pictocode')
       .querySelector('img');
     picElement.setAttribute('src', imgSrc);
@@ -283,7 +298,7 @@ const comAmudarIO = {
       currentTemperature + '°';
   },
 
-  setCurrentTemperatureFinish: function (data) {
+  setCurrentTemperatureFinish: function (data, imgSrc) {
     const todayData = data.slice(24);
     const currentTemperature = Math.round(
       todayData[todayData.length - 1].temperature
@@ -291,6 +306,11 @@ const comAmudarIO = {
     const temperatures = todayData.map((d) => d.temperature);
     const max = Math.max(...temperatures);
     const min = Math.min(...temperatures);
+    const picElement = document
+      .querySelector('.meteostation-finish')
+      .querySelector('.pictocode')
+      .querySelector('img');
+    picElement.setAttribute('src', imgSrc);
 
     document
       .querySelector('.meteostation-finish')
@@ -501,7 +521,7 @@ const comAmudarIO = {
       translations[this.language].atmPressure
     }</span
   ><span class="atm-pressure-value value">${
-    Math.round(data.temperature) + 'mBar'
+    Math.round(data.sealevelpressure) + 'mBar'
   }</span>`;
   },
 
