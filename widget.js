@@ -11,6 +11,8 @@ const translations = {
     atmPressure: 'Атм. давление',
     today: 'Сегодня',
     tomorrow: 'Завтра',
+    startFinish: 'Старт / Финиш',
+    bakhmal: 'Бахмал (25км)',
     aqi: {
       good: 'Xopoшoe',
       moderate: 'Умеренное',
@@ -41,6 +43,8 @@ const translations = {
     atmPressure: 'Atm. bosimi',
     today: 'Bugun',
     tomorrow: 'Ertaga',
+    startFinish: 'Start / Finish',
+    bakhmal: 'Baxmal (25km)',
     aqi: {
       good: 'Yaxshi',
       moderate: "O'rtacha",
@@ -71,6 +75,8 @@ const translations = {
     atmPressure: 'Atm. pressure',
     today: 'Today',
     tomorrow: 'Tomorrow',
+    startFinish: 'Start / Finish',
+    bakhmal: 'Bakhmal (25km)',
     aqi: {
       good: 'Good',
       moderate: 'Moderate',
@@ -174,35 +180,46 @@ const comAmudarIO = {
   },
 
   start: async function () {
+    this.setTitle();
     const forecastData = await this.getForecastData();
     this._forecastData = forecastData;
-    // const currentForecastStart = forecastData.find(
-    //   (d) => new Date(d.time).getHours() === new Date().getHours()
-    // );
-    // const forecastFinish = await this.getForecastFinishData();
-    // const currForecastFinish = forecastFinish.find(
-    //   (d) => new Date(d.time).getHours() === new Date().getHours()
-    // );
-    // const meteostationData = await this.getMeteostationData();
-    const first4Days = this.getLast4Days(forecastData);
+    const currentForecastStart = forecastData.find(
+      (d) => new Date(d.time).getHours() === new Date().getHours()
+    );
+    const forecastFinish = await this.getForecastFinishData();
+    const currForecastFinish = forecastFinish.find(
+      (d) => new Date(d.time).getHours() === new Date().getHours()
+    );
+    const meteostationData = await this.getMeteostationData();
+    // const first4Days = this.getLast4Days(forecastData);
     // const temperatures = this.getTemperature(forecastData);
-    // const device = await this.getDevice();
-    // const imgSrcStart = this.getImgSrc(
-    //   currentForecastStart.pictocode,
-    //   currentForecastStart.isdaylight
-    // );
-    // const imgSrcFinish = this.getImgSrc(
-    //   currForecastFinish.pictocode,
-    //   currForecastFinish.isdaylight
-    // );
-    // this.addMeteostationData(meteostationData[meteostationData.length - 1]);
-    // this.addMeteostationFinishData(currForecastFinish);
+    const [deviceStart, deviceEnd] = await this.getDevice();
+    const imgSrcStart = this.getImgSrc(
+      currentForecastStart.pictocode,
+      currentForecastStart.isdaylight
+    );
+    const imgSrcFinish = this.getImgSrc(
+      currForecastFinish.pictocode,
+      currForecastFinish.isdaylight
+    );
 
-    // this.addCurrentAQI(meteostationData);
-    // this.addCurrentAQIFinish(currForecastFinish);
-    // this.setCurrentTemperature(meteostationData, imgSrcStart);
-    // this.setCurrentTemperatureFinish(forecastData, imgSrcFinish);
-    this.generateForecastCards(first4Days);
+    this.setASL(deviceStart, deviceEnd);
+
+    this.addMeteostationData(meteostationData[meteostationData.length - 1]);
+    this.addMeteostationFinishData(currForecastFinish);
+
+    this.addCurrentAQI(meteostationData);
+    this.addCurrentAQIFinish(currForecastFinish);
+    this.setCurrentTemperature(meteostationData, imgSrcStart);
+    this.setCurrentTemperatureFinish(forecastFinish, imgSrcFinish);
+    // this.generateForecastCards(first4Days);
+  },
+
+  setTitle: function () {
+    const titleStart = document.querySelector('.title-start');
+    const titleEnd = document.querySelector('.title-end');
+    titleStart.innerHTML = translations[this.language].startFinish;
+    titleEnd.innerHTML = translations[this.language].bakhmal;
   },
 
   getImgSrc: function (pictocode, isDayLight) {
@@ -217,7 +234,7 @@ const comAmudarIO = {
       headers: this._headers_zamin,
     });
     const devices = (await response.json()).data;
-    return devices[0];
+    return devices;
   },
 
   getMeteostationData: async function () {
@@ -280,10 +297,14 @@ const comAmudarIO = {
     return filtered;
   },
 
-  setASL: function (device) {
-    const aslContainer = document.querySelector('.asl-container');
-    aslContainer.innerHTML =
-      device.asl + translations[this.language].aboveSeaLevel;
+  setASL: function (deviceStart, deviceEnd) {
+    const aslStartContainer = document.querySelector('.asl-start');
+    aslStartContainer.innerHTML =
+      deviceStart.asl + translations[this.language].aboveSeaLevel;
+
+    const aslEndContainer = document.querySelector('.asl-end');
+    aslEndContainer.innerHTML =
+      deviceEnd.asl + translations[this.language].aboveSeaLevel;
   },
 
   setCurrentTemperature: function (data, imgSrc) {
@@ -292,7 +313,7 @@ const comAmudarIO = {
     const max = Math.max(...temperatures);
     const min = Math.min(...temperatures);
     const picElement = document
-      .querySelector('.meteostation')
+      .querySelector('.meteostation-start')
       .querySelector('.pictocode')
       .querySelector('img');
     picElement.setAttribute('src', imgSrc);
@@ -303,8 +324,10 @@ const comAmudarIO = {
   },
 
   setCurrentTemperatureFinish: function (data, imgSrc) {
-    const todayData = data.slice(24);
-    const currentTemperature = todayData.find((d) => new Date());
+    const todayData = data.slice(0, 24);
+    const currentTemperature = todayData.find(
+      (d) => new Date(d.time).getHours() === new Date().getHours()
+    ).temperature;
     const temperatures = todayData.map((d) => d.temperature);
     const max = Math.max(...temperatures);
     const min = Math.min(...temperatures);
@@ -322,7 +345,8 @@ const comAmudarIO = {
       .querySelector('.min-temp').innerHTML = Math.round(min) + '°C';
     document
       .querySelector('.meteostation-finish')
-      .querySelector('.temperature-big').innerHTML = currentTemperature + '°';
+      .querySelector('.temperature-big').innerHTML =
+      Math.round(currentTemperature) + '°';
   },
 
   generateForecastCards: function (data) {
@@ -342,15 +366,17 @@ const comAmudarIO = {
       let forecastCard = document.createElement('div');
       forecastCard.setAttribute('class', 'forecast-card col-12 col-sm-6 p-1');
       forecastCard.innerHTML = `<div class="card-wrapper">
-        ${this.getDateElement(element.time, i)}
-        ${this.getTemperatureElement(element.time)}
-        ${this.getWindElement(element)}
-        ${this.getUVElement(element.uvindex)}
-        ${this.getRainElement(element)}
-        ${this.getAQIElement(element.airqualityindex, lastAQI)}
-        ${this.getDustElement(element.pm25, lastDust)}
-        </div>
-      `;
+          ${this.getDateElement(element.time, i)}
+          ${this.getTemperatureElement(element.time)}
+          ${this.getWindSpeedElement(element.windspeed)}
+          ${this.getWindDirectionElement(element.winddirection)}
+          ${this.getUVElement(element.uvindex)}
+          ${this.getRainElement(element.precipitation)}
+          ${this.getHumidityElement(element.relativehumidity)}
+          ${this.getAQIElement(element.airqualityindex, lastAQI)}
+          ${this.getDustElement(element.pm25, lastDust)}
+          </div>
+        `;
       if (i == 0 || i == 1) {
         forecastStartContainer.append(forecastCard);
       } else {
@@ -420,47 +446,47 @@ const comAmudarIO = {
   addMeteostationData: function (data, imgSrc) {
     const temperatureElem = document.querySelector('.c-temperature');
     temperatureElem.innerHTML = `<span>
-    <i class="fa-solid fa-temperature-three-quarters me-2"></i>${
-      translations[this.language].temperature
-    }</span
-  ><span class="temperature-value value">${Math.round(data.AirT)}°C</span>`;
+      <i class="fa-solid fa-temperature-three-quarters me-2"></i>${
+        translations[this.language].temperature
+      }</span
+    ><span class="temperature-value value">${Math.round(data.AirT)}°C</span>`;
 
     const humidityElem = document.querySelector('.c-humidity');
     humidityElem.innerHTML = `<span
-    ><i class="fa-solid fa-droplet me-2"></i>${
-      translations[this.language].humidity
-    }</span
-  ><span class="humidity-value value">${Math.round(data.AirH)}%</span>`;
+      ><i class="fa-solid fa-droplet me-2"></i>${
+        translations[this.language].humidity
+      }</span
+    ><span class="humidity-value value">${Math.round(data.AirH)}%</span>`;
 
     const rainElem = document.querySelector('.c-rain');
     rainElem.innerHTML = `<span><i class="fa-solid fa-cloud-rain me-2"></i>${
       translations[this.language].precipitation
     }</span
-    ><span class="rain-value value">${Math.round(data.Rain)}mm</span>`;
+      ><span class="rain-value value">${Math.round(data.Rain)}mm</span>`;
 
     const windspeedElem = document.querySelector('.c-windspeed');
     windspeedElem.innerHTML = `<span
-    ><i class="fa-solid fa-wind me-2"></i>${
-      translations[this.language].windspeed
-    }</span
-  ><span class="windspeed-value value">${Math.round(data.WindMax)}m/c</span>`;
+      ><i class="fa-solid fa-wind me-2"></i>${
+        translations[this.language].windspeed
+      }</span
+    ><span class="windspeed-value value">${Math.round(data.WindMax)}m/c</span>`;
     const winddirectionElem = document.querySelector('.c-winddirection');
     winddirectionElem.innerHTML = `<span
-    ><i class="fa-solid fa-location-arrow me-2"></i>${
-      translations[this.language].winddirection
-    }</span
-  ><span class="winddirection-value value">${this.getWindDirections(
-    data.WindD
-  )}</span>`;
+      ><i class="fa-solid fa-location-arrow me-2"></i>${
+        translations[this.language].winddirection
+      }</span
+    ><span class="winddirection-value value">${this.getWindDirections(
+      data.WindD
+    )}</span>`;
 
     const atmPressureElem = document.querySelector('.c-air-pressure');
     atmPressureElem.innerHTML = `<span
-    ><i class="fa-solid fa-arrow-down me-2"></i>${
-      translations[this.language].atmPressure
-    }</span
-  ><span class="atm-pressure-value value">${
-    Math.round(data.AirP) + 'mBar'
-  }</span>`;
+      ><i class="fa-solid fa-arrow-down me-2"></i>${
+        translations[this.language].atmPressure
+      }</span
+    ><span class="atm-pressure-value value">${
+      Math.round(data.AirP) + 'mBar'
+    }</span>`;
   },
 
   addMeteostationFinishData: function (data) {
@@ -468,23 +494,23 @@ const comAmudarIO = {
       .querySelector('.meteostation-finish')
       .querySelector('.c-temperature');
     temperatureElem.innerHTML = `<span>
-    <i class="fa-solid fa-temperature-three-quarters me-2"></i>${
-      translations[this.language].temperature
-    }</span
-  ><span class="temperature-value value">${Math.round(
-    data.temperature
-  )}°C</span>`;
+      <i class="fa-solid fa-temperature-three-quarters me-2"></i>${
+        translations[this.language].temperature
+      }</span
+    ><span class="temperature-value value">${Math.round(
+      data.temperature
+    )}°C</span>`;
 
     const humidityElem = document
       .querySelector('.meteostation-finish')
       .querySelector('.c-humidity');
     humidityElem.innerHTML = `<span
-    ><i class="fa-solid fa-droplet me-2"></i>${
-      translations[this.language].humidity
-    }</span
-  ><span class="humidity-value value">${Math.round(
-    data.relativehumidity
-  )}%</span>`;
+      ><i class="fa-solid fa-droplet me-2"></i>${
+        translations[this.language].humidity
+      }</span
+    ><span class="humidity-value value">${Math.round(
+      data.relativehumidity
+    )}%</span>`;
 
     const rainElem = document
       .querySelector('.meteostation-finish')
@@ -492,37 +518,41 @@ const comAmudarIO = {
     rainElem.innerHTML = `<span><i class="fa-solid fa-cloud-rain me-2"></i>${
       translations[this.language].precipitation
     }</span
-    ><span class="rain-value value">${Math.round(data.precipitation)}mm</span>`;
+      ><span class="rain-value value">${Math.round(
+        data.precipitation
+      )}mm</span>`;
 
     const windspeedElem = document
       .querySelector('.meteostation-finish')
       .querySelector('.c-windspeed');
     windspeedElem.innerHTML = `<span
-    ><i class="fa-solid fa-wind me-2"></i>${
-      translations[this.language].windspeed
-    }</span
-  ><span class="windspeed-value value">${Math.round(data.windspeed)}m/c</span>`;
+      ><i class="fa-solid fa-wind me-2"></i>${
+        translations[this.language].windspeed
+      }</span
+    ><span class="windspeed-value value">${Math.round(
+      data.windspeed
+    )}m/c</span>`;
     const winddirectionElem = document
       .querySelector('.meteostation-finish')
       .querySelector('.c-winddirection');
     winddirectionElem.innerHTML = `<span
-    ><i class="fa-solid fa-location-arrow me-2"></i>${
-      translations[this.language].winddirection
-    }</span
-  ><span class="winddirection-value value">${this.getWindDirections(
-    data.winddirection
-  )}</span>`;
+      ><i class="fa-solid fa-location-arrow me-2"></i>${
+        translations[this.language].winddirection
+      }</span
+    ><span class="winddirection-value value">${this.getWindDirections(
+      data.winddirection
+    )}</span>`;
 
     const atmPressureElem = document
       .querySelector('.meteostation-finish')
       .querySelector('.c-air-pressure');
     atmPressureElem.innerHTML = `<span
-    ><i class="fa-solid fa-arrow-down me-2"></i>${
-      translations[this.language].atmPressure
-    }</span
-  ><span class="atm-pressure-value value">${
-    Math.round(data.sealevelpressure) + 'mBar'
-  }</span>`;
+      ><i class="fa-solid fa-arrow-down me-2"></i>${
+        translations[this.language].atmPressure
+      }</span
+    ><span class="atm-pressure-value value">${
+      Math.round(data.sealevelpressure) + 'mBar'
+    }</span>`;
   },
 
   getDateElement: function (time, i) {
@@ -568,15 +598,11 @@ const comAmudarIO = {
     return temperatureContainer.outerHTML;
   },
 
-  getWindElement: function (element) {
+  getWindSpeedElement: function (windspeed) {
     const windContainer = document.createElement('div');
     windContainer.classList.add('wind-part', 'part');
     const windElement = document.createElement('div');
-    windElement.innerHTML =
-      this.getWindDirections(element.winddirection) +
-      ' ' +
-      Math.round(element.windspeed) +
-      ' <span>м/c</span>';
+    windElement.innerHTML = Math.round(windspeed) + ' <span>м/c</span>';
     windContainer.append(windElement);
     return windContainer.outerHTML;
   },
@@ -584,6 +610,7 @@ const comAmudarIO = {
   getWindDirectionElement: function (winddirection) {
     const windDrctElemContainer = document.createElement('div');
     windDrctElemContainer.classList.add('wind-direction-part', 'part');
+
     const windDrctElement = document.createElement('div');
     windDrctElement.innerHTML = this.getWindDirections(winddirection);
     windDrctElemContainer.append(windDrctElement);
@@ -595,19 +622,17 @@ const comAmudarIO = {
     uvElemContainer.classList.add('uv-part', 'part');
 
     const uvElement = document.createElement('div');
-    uvElement.innerHTML = '☀️ ';
     if (uvindex > 11) {
-      uvElement.innerHTML += '11+';
+      uvElement.innerHTML = '11+';
       uvElement.style = 'background-color: #998CFF';
     } else {
-      uvElement.innerHTML += uvindex + '<span>/11 UV</span>';
+      uvElement.innerHTML = uvindex + '<span>/11 UV</span>';
     }
     uvElemContainer.append(uvElement);
     return uvElemContainer.outerHTML;
   },
 
-  getRainElement: function (element) {
-    const precipitation = element.precipitation;
+  getRainElement: function (precipitation) {
     const rainElemContainer = document.createElement('div');
     rainElemContainer.classList.add('rain-part', 'part');
 
@@ -620,7 +645,6 @@ const comAmudarIO = {
     } else {
       rainElement.innerHTML = '<img src="assets/raindrop.png"> -';
     }
-    rainElement.innerHTML += ` (${element.precipitation_probability}%)`;
     rainElemContainer.append(rainElement);
     return rainElemContainer.outerHTML;
   },
@@ -698,13 +722,17 @@ const comAmudarIO = {
         16.6;
     const aqiPercentElem = document.querySelector('.aqi-percentage');
     aqiPercentElem.innerHTML = `<div class="aqi-percentage">
-    <b>${
-      translations[this.language].airQuality
-    }</b> <span class="aqi-percent">${Math.round(AQIPercentage)}%</span>
-  </div>`;
+      <b>${
+        translations[this.language].airQuality
+      }</b> <span class="aqi-percent">${Math.round(AQIPercentage)}%</span>
+    </div>`;
     const aqiStatusElem = document.querySelector('.aqi-status');
     aqiStatusElem.style = `color: ${AQI[category].fontColor}; background-color: ${AQI[category].backgroundColor}`;
     aqiStatusElem.innerHTML = translations[this.language].aqi[category];
+
+    const pm25 = document.querySelector('.pm25-start');
+    pm25.innerHTML = '<span>PM 2.5: </span>' + lastPM25 + ' <span>μg/m3</span>';
+    pm25.style = `color: ${AQI[category].fontColor};`;
 
     const config = AQI[category];
 
@@ -718,7 +746,7 @@ const comAmudarIO = {
   },
 
   addCurrentAQIFinish: function (data) {
-    const lastPM25 = data.pm25;
+    const lastPM25 = Math.round(data.pm25);
     const categoryRange = {
       good: 83,
       moderate: 66.4,
@@ -741,15 +769,19 @@ const comAmudarIO = {
       .querySelector('.meteostation-finish')
       .querySelector('.aqi-percentage');
     aqiPercentElem.innerHTML = `<div class="aqi-percentage">
-    <b>${
-      translations[this.language].airQuality
-    }</b> <span class="aqi-percent">${Math.round(AQIPercentage)}%</span>
-  </div>`;
+      <b>${
+        translations[this.language].airQuality
+      }</b> <span class="aqi-percent">${Math.round(AQIPercentage)}%</span>
+    </div>`;
     const aqiStatusElem = document
       .querySelector('.meteostation-finish')
       .querySelector('.aqi-status');
     aqiStatusElem.style = `color: ${AQI[category].fontColor}; background-color: ${AQI[category].backgroundColor}`;
     aqiStatusElem.innerHTML = translations[this.language].aqi[category];
+
+    const pm25 = document.querySelector('.pm25-end');
+    pm25.innerHTML = '<span>PM 2.5: </span>' + lastPM25 + ' <span>μg/m3</span>';
+    pm25.style = `color: ${AQI[category].fontColor};`;
 
     const config = AQI[category];
     let imgSrc = config.img;
