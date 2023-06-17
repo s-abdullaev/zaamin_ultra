@@ -369,11 +369,9 @@ const comAmudarIO = {
       forecastCard.innerHTML = `<div class="card-wrapper">
           ${this.getDateElement(element.time, i)}
           ${this.getTemperatureElement(element.time)}
-          ${this.getWindSpeedElement(element.windspeed)}
-          ${this.getWindDirectionElement(element.winddirection)}
+          ${this.getWindElement(element)}
           ${this.getUVElement(element.uvindex)}
-          ${this.getRainElement(element.precipitation)}
-          ${this.getHumidityElement(element.relativehumidity)}
+          ${this.getRainElement(element)}
           ${this.getAQIElement(element.airqualityindex, lastAQI)}
           ${this.getDustElement(element.pm25, lastDust)}
           </div>
@@ -599,6 +597,19 @@ const comAmudarIO = {
     return temperatureContainer.outerHTML;
   },
 
+  getWindElement: function (element) {
+    const windContainer = document.createElement('div');
+    windContainer.classList.add('wind-part', 'part');
+    const windElement = document.createElement('div');
+    windElement.innerHTML =
+      this.getWindDirections(element.winddirection) +
+      ' ' +
+      Math.round(element.windspeed) +
+      ' <span>м/c</span>';
+    windContainer.append(windElement);
+    return windContainer.outerHTML;
+  },
+
   getWindSpeedElement: function (windspeed) {
     const windContainer = document.createElement('div');
     windContainer.classList.add('wind-part', 'part');
@@ -623,17 +634,19 @@ const comAmudarIO = {
     uvElemContainer.classList.add('uv-part', 'part');
 
     const uvElement = document.createElement('div');
+    uvElement.innerHTML = '☀️ ';
     if (uvindex > 11) {
-      uvElement.innerHTML = '11+';
+      uvElement.innerHTML += '11+';
       uvElement.style = 'background-color: #998CFF';
     } else {
-      uvElement.innerHTML = uvindex + '<span>/11 UV</span>';
+      uvElement.innerHTML += uvindex + '<span>/11 UV</span>';
     }
     uvElemContainer.append(uvElement);
     return uvElemContainer.outerHTML;
   },
 
-  getRainElement: function (precipitation) {
+  getRainElement: function (element) {
+    const precipitation = element.precipitation;
     const rainElemContainer = document.createElement('div');
     rainElemContainer.classList.add('rain-part', 'part');
 
@@ -646,6 +659,7 @@ const comAmudarIO = {
     } else {
       rainElement.innerHTML = '<img src="assets/raindrop.png"> -';
     }
+    rainElement.innerHTML += ` (${element.precipitation_probability}%)`;
     rainElemContainer.append(rainElement);
     return rainElemContainer.outerHTML;
   },
