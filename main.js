@@ -159,7 +159,7 @@ const AQI = {
 const tashkentCityToken = 'Bearer 19|LPFBmcdmbXhR02izysneHsgkMz4ObWC9DJQw81Cc';
 const tashkentCityStationId = '036112022';
 const zaminToken = 'Bearer 23|Sgu8NP1r1jt7t6qrd8ilI8f58MBdJC0UajPE0pgu';
-const zaminStationId = '00000000';
+const zaminStationId = '068062023';
 const zaminStationIdEnd = '12345678';
 const comAmudarIO = {
   language: 'en',
@@ -171,6 +171,7 @@ const comAmudarIO = {
   },
   _headers_zamin: {
     Authorization: zaminToken,
+    'Content-Type': 'application/json;charset=utf-8',
   },
 
   start: async function () {
@@ -223,9 +224,9 @@ const comAmudarIO = {
   getMeteostationData: async function () {
     const resp = await fetch('https://oxus.amudar.io/api/influx/meteostation', {
       method: 'POST',
-      headers: this._headers_tashkent,
+      headers: this._headers_zamin,
       body: JSON.stringify({
-        stationId: '036112022',
+        stationId: '068062023',
         start: '-1d',
         end: 'now()',
         interval: '1h',
@@ -237,7 +238,7 @@ const comAmudarIO = {
 
   getForecastData: async function () {
     const response = await fetch(
-      'https://oxus.amudar.io/api/forecasts/device/00000000',
+      'https://oxus.amudar.io/api/forecasts/device/068062023',
       {
         method: 'GET',
         headers: this._headers_zamin,
