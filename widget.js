@@ -542,6 +542,12 @@ const comAmudarIO = {
       data.winddirection
     )}</span>`;
 
+    const atmPressure = this.convertPressureByAltitude(
+      data.sealevelpressure,
+      1949,
+      data.temperature
+    );
+
     const atmPressureElem = document
       .querySelector('.meteostation-finish')
       .querySelector('.c-air-pressure');
@@ -550,7 +556,7 @@ const comAmudarIO = {
         translations[this.language].atmPressure
       }</span
     ><span class="atm-pressure-value value">${
-      Math.round(data.sealevelpressure) + 'mBar'
+      Math.round(atmPressure) + 'mBar'
     }</span>`;
   },
 
@@ -839,6 +845,30 @@ const comAmudarIO = {
       status = 'unknown';
     }
     return status;
+  },
+
+  convertPressureByAltitude: function (
+    seaLevelPressure,
+    altitude,
+    temperatureCelsius
+  ) {
+    const g0 = 9.80665; // acceleration due to gravity at sea level (m/s^2)
+    const M = 0.0289644; // molar mass of Earth's air (kg/mol)
+    const R = 8.31432; // universal gas constant (N·m/(mol·K))
+    const lapseRate = 0.0065; // temperature lapse rate (K/m)
+
+    // Convert temperature from Celsius to Kelvin
+    const altitudeTemperature = temperatureCelsius + 273.15;
+
+    // Calculate the pressure at the given altitude
+    const pressure =
+      seaLevelPressure *
+      Math.pow(
+        1 - (lapseRate * altitude) / altitudeTemperature,
+        (g0 * M) / (R * lapseRate)
+      );
+
+    return pressure;
   },
 };
 
