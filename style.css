@@ -122,9 +122,13 @@ ul li p {
 .temperature-box > div {
   margin: 0 10px;
 }
-
+ 
 .temperature-box div:first-child {
   margin: 0;
+}
+
+.schedule-time {
+  color: #f60c5a;
 }
 
 .temperature-box img {
