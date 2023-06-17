@@ -165,7 +165,7 @@ const AQI = {
 const tashkentCityToken = 'Bearer 19|LPFBmcdmbXhR02izysneHsgkMz4ObWC9DJQw81Cc';
 const tashkentCityStationId = '036112022';
 const zaminToken = 'Bearer 23|Sgu8NP1r1jt7t6qrd8ilI8f58MBdJC0UajPE0pgu';
-const zaminStationId = '00000000';
+const zaminStationId = '068062023';
 const zaminStationIdEnd = '12345678';
 const comAmudarIO = {
   language: 'en',
@@ -177,6 +177,7 @@ const comAmudarIO = {
   },
   _headers_zamin: {
     Authorization: zaminToken,
+    'Content-Type': 'application/json;charset=utf-8',
   },
 
   start: async function () {
@@ -191,7 +192,7 @@ const comAmudarIO = {
       (d) => new Date(d.time).getHours() === new Date().getHours()
     );
     const meteostationData = await this.getMeteostationData();
-    // const first4Days = this.getLast4Days(forecastData);
+    const first4Days = this.getLast4Days(forecastData);
     // const temperatures = this.getTemperature(forecastData);
     const [deviceStart, deviceEnd] = await this.getDevice();
     const imgSrcStart = this.getImgSrc(
@@ -208,11 +209,11 @@ const comAmudarIO = {
     this.addMeteostationData(meteostationData[meteostationData.length - 1]);
     this.addMeteostationFinishData(currForecastFinish);
 
-    this.addCurrentAQI(meteostationData);
-    this.addCurrentAQIFinish(currForecastFinish);
+    // this.addCurrentAQI(meteostationData);
+    // this.addCurrentAQIFinish(currForecastFinish);
     this.setCurrentTemperature(meteostationData, imgSrcStart);
     this.setCurrentTemperatureFinish(forecastFinish, imgSrcFinish);
-    // this.generateForecastCards(first4Days);
+    this.generateForecastCards(first4Days);
   },
 
   setTitle: function () {
@@ -242,7 +243,7 @@ const comAmudarIO = {
       method: 'POST',
       headers: this._headers_tashkent,
       body: JSON.stringify({
-        stationId: '036112022',
+        stationId: '068062023',
         start: '-1d',
         end: 'now()',
         interval: '1h',
@@ -254,7 +255,7 @@ const comAmudarIO = {
 
   getForecastData: async function () {
     const response = await fetch(
-      'https://oxus.amudar.io/api/forecasts/device/00000000',
+      'https://oxus.amudar.io/api/forecasts/device/068062023',
       {
         method: 'GET',
         headers: this._headers_zamin,
