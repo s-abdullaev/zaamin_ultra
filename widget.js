@@ -182,6 +182,9 @@ const comAmudarIO = {
 
   start: async function () {
     this.setTitle();
+    setInterval(() => {
+      this.setTime();
+    }, 1000);
     const forecastData = await this.getForecastData();
     this._forecastData = forecastData;
     const currentForecastStart = forecastData.find(
@@ -221,6 +224,11 @@ const comAmudarIO = {
     const titleEnd = document.querySelector('.title-end');
     titleStart.innerHTML = translations[this.language].startFinish;
     titleEnd.innerHTML = translations[this.language].bakhmal;
+  },
+
+  setTime: function () {
+    const liveTimeElem = document.querySelector('.live-time');
+    liveTimeElem.innerHTML = this.getCurrentTime();
   },
 
   getImgSrc: function (pictocode, isDayLight) {
@@ -597,7 +605,7 @@ const comAmudarIO = {
     temperatureContainer.append(hotDiv);
 
     const coldDiv = document.createElement('div');
-    coldDiv.style = `color: white; background-color: lightblue`;
+    coldDiv.style = `color: black; background-color: lightblue`;
     coldDiv.innerHTML = Math.round(temperature.cold) + ' <span>°C</span>';
     temperatureContainer.append(coldDiv);
     return temperatureContainer.outerHTML;
@@ -870,6 +878,29 @@ const comAmudarIO = {
 
     return pressure;
   },
+
+  getCurrentTime: function () {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    // Format the time as HH:MM:SS
+    const formattedTime = `${this.padZero(hours)}:${this.padZero(
+      minutes
+    )}:${this.padZero(seconds)}`;
+
+    return formattedTime;
+  },
+
+  // Helper function to pad single digits with leading zeros
+  padZero: function (num) {
+    return num.toString().padStart(2, '0');
+  },
+
+  // Example usage
+  // const currentTime = getCurrentTime();
+  // console.log("Current Time:", currentTime);
 };
 
 const queryString = window.location.search;
