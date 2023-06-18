@@ -254,7 +254,7 @@ const comAmudarIO = {
         stationId: '068062023',
         start: '-1d',
         end: 'now()',
-        interval: '1h',
+        interval: '15m',
       }),
     });
     const data = await resp.json();
