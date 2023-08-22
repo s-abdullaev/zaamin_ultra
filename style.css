@@ -27,6 +27,19 @@ ul li p {
   margin-bottom: 0;
 }
 
+i {
+  text-align: center;
+  display: inline-block;
+  width: 20px;
+}
+
+.bukhara-wrapper {
+  background-image: url('assets/bukhara.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .asl {
   text-align: center;
 }
@@ -35,6 +48,7 @@ ul li p {
   border-radius: 10px;
   padding: 10px;
   background-color: gainsboro;
+  opacity: 0.85;
   color: black;
 }
 
@@ -55,6 +69,7 @@ ul li p {
   padding: 10px;
   border-radius: 10px;
   background-color: gainsboro;
+  opacity: 0.85;
   color: black;
 }
 
@@ -152,7 +167,6 @@ ul li p {
 }
 
 .link {
-  /* color: rgb(7, 7, 172); */
   color: whitesmoke;
   text-align: center;
 }
@@ -221,7 +235,6 @@ ul li p {
 }
 
 .temperature-part {
-  /* margin: 5px 0; */
   color: black !important;
 }
 
