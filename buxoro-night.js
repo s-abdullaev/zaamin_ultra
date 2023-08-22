@@ -372,39 +372,6 @@ const comAmudarIO = {
       Math.round(currentTemperature) + '°';
   },
 
-  //   generateForecastCards: function (data) {
-  //     const forecastStartContainer = document.querySelector('.forecast-start');
-  //     const forecastEndContainer = document.querySelector('.forecast-end');
-  //     let lastAQI = 0;
-  //     let lastDust = 0;
-  //     for (let i = 0; i < data.length; i++) {
-  //       const element = data[i];
-  //       lastAQI =
-  //         i > 0
-  //           ? data[i - 1].airqualityindex
-  //             ? data[i - 1].airqualityindex
-  //             : lastAQI
-  //           : 0;
-  //       lastDust = i > 0 ? (data[i - 1].pm25 ? data[i - 1].pm25 : lastDust) : 0;
-  //       let forecastCard = document.createElement('div');
-  //       forecastCard.setAttribute('class', 'forecast-card col-12 col-sm-6 p-1');
-  //       forecastCard.innerHTML = `<div class="card-wrapper">
-  //             ${this.getDateElement(element.time, i)}
-  //             ${this.getTemperatureElement(element.time)}
-  //             ${this.getWindElement(element)}
-  //             ${this.getUVElement(element.uvindex)}
-  //             ${this.getRainElement(element)}
-  //             ${this.getDustElement(element.pm25, lastDust)}
-  //             </div>
-  //           `;
-  //       if (i == 0 || i == 1) {
-  //         forecastStartContainer.append(forecastCard);
-  //       } else {
-  //         forecastEndContainer.append(forecastCard);
-  //       }
-  //     }
-  //   },
-
   getTemperature: function (data) {
     const day = 24;
     let temperatures = [];
@@ -473,8 +440,9 @@ const comAmudarIO = {
     const precipitation_probability = document.querySelector(
       '.c-precipitation-probability'
     );
-    precipitation_probability.innerHTML = `<span><i class="fa-solid fa-percentage me-2"></i>
-    ${translations[this.language].precipitation_probability}</span>
+    precipitation_probability.innerHTML = `<span><i class="fa-solid fa-percentage me-2"></i>${
+      translations[this.language].precipitation_probability
+    }</span>
     <span class="probability-value value">${Math.round(
       forecast.precipitation_probability
     )}%</span>`;
@@ -706,31 +674,6 @@ const comAmudarIO = {
     humidityContainer.append(humidityElement);
     return humidityContainer.outerHTML;
   },
-
-  //   getAQIElement: function (airqualityindex, lastAQI) {
-  //     const aqi = airqualityindex || lastAQI;
-  //     const status = this.getStatusByForAQI(aqi);
-  //     const config = AQI[status];
-  //     let imgSrc = config.img;
-  //     let bgColor = config.backgroundColor;
-  //     this._dustColor = config.fontColor;
-
-  //     const aqiContainer = document.createElement('div');
-  //     aqiContainer.classList.add('aqi-part', 'part');
-
-  //     const aqiValue = document.createElement('div');
-  //     aqiValue.classList.add('aqi-value');
-  //     aqiValue.innerHTML = `<span class='aqi-icon'>AQI</span>${aqi}`;
-  //     aqiValue.style = `color: ${this._dustColor};`;
-
-  //     const aqiImgWrapper = document.createElement('div');
-  //     aqiImgWrapper.classList.add('aqi-img-wrapper');
-  //     aqiImgWrapper.style = `background-color: ${bgColor};`;
-  //     aqiImgWrapper.innerHTML = `<img src='assets/${imgSrc}'>`;
-  //     aqiContainer.append(aqiValue);
-  //     aqiContainer.append(aqiImgWrapper);
-  //     return aqiContainer.outerHTML;
-  //   },
 
   getDustElement: function (dustV, lastDust) {
     const dust = dustV || lastDust;
