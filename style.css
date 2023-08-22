@@ -137,7 +137,7 @@ i {
 .temperature-box > div {
   margin: 0 10px;
 }
- 
+
 .temperature-box div:first-child {
   margin: 0;
 }
@@ -154,6 +154,10 @@ i {
 .temperature-big,
 .title {
   font-size: 48px;
+}
+
+.c-precipitation-probability i {
+  font-size: 14px;
 }
 
 .pictocode {
